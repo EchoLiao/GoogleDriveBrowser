@@ -7,12 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <GTLRDrive.h>
 
 
 
 @import Foundation;
 @import GoogleSignIn;
-@import GoogleAPIClientForREST;
 
 @protocol SDGDTableViewControllerDelegate;
 
