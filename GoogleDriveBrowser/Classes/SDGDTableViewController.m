@@ -104,7 +104,7 @@
         
         newProgressView.alpha = 0.0;
         newProgressView.tintColor = self.colorTheme;
-        newProgressView.trackTintColor = [UIColor lightGrayColor];
+        newProgressView.trackTintColor = [UIColor darkGrayColor];
         
         CGAffineTransform transform = CGAffineTransformMakeScale(1.0f, 1.5f);
         newProgressView.transform = transform;
@@ -115,12 +115,13 @@
         /// Add Progress label over navigation bar
         self.progressView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, navWidth, navHeight-3)];
         self.lblProgress = [[UILabel alloc]initWithFrame:CGRectMake(15, 0, navWidth, navHeight-3)];
-        self.lblProgress.textColor = [UIColor blackColor];
-        [self.lblProgress setFont:[UIFont systemFontOfSize:16]];
+        self.lblProgress.textColor = [UIColor whiteColor];
+        [self.lblProgress setFont:[UIFont systemFontOfSize:14]];
         self.lblProgress.text = @"";
-        [self.progressView addSubview:_lblProgress];
+        [self.progressView addSubview:self.lblProgress];
         [self.navigationController.navigationBar addSubview:self.progressView];
-        self.progressView.backgroundColor = [UIColor whiteColor];
+        self.lblProgress.backgroundColor = [UIColor clearColor];
+        self.progressView.backgroundColor = [UIColor colorWithRed:0x20/255.0 green:0x1f/255.0 blue:0x24/255.0 alpha:1];;
         self.progressView.hidden = true;
         
         UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -148,6 +149,7 @@
     /// No data founds label
 #pragma mark - No data founds label
     self.lblnoData = [[UILabel alloc]initWithFrame:CGRectMake(0.0, 50, self.view.frame.size.width, 30)];
+    self.lblnoData.textColor = [UIColor lightGrayColor];
     self.lblnoData.text = @"";
     [self.view addSubview:self.lblnoData];
     //self.lblnoData.center = self.view.center;
@@ -414,6 +416,7 @@ didSignInForUser:(GIDGoogleUser *)user
     
     cell.btnDownload.hidden = false;
     cell.imgDownload.hidden = false;
+    cell.imgDownload.tintColor = [UIColor whiteColor];
 
     cell.accessoryType = UITableViewCellAccessoryNone;
     GTLRDrive_File *file = self.fileListArray[indexPath.row];
@@ -428,12 +431,8 @@ didSignInForUser:(GIDGoogleUser *)user
         cell.imgDownload.hidden = true;
     }
     
-    cell.accessoryView = nil;
-    
     /// Download Button
-    if (  ![file.mimeType isEqualToString:@"application/vnd.google-apps.folder"] ) {
-        
-        // File Extension
+    if (![file.mimeType isEqualToString:@"application/vnd.google-apps.folder"] ) {
         if (file.size) {
             fileSize = [NSByteCountFormatter stringFromByteCount:[file.size longLongValue] countStyle:NSByteCountFormatterCountStyleFile];
         }
@@ -443,47 +442,37 @@ didSignInForUser:(GIDGoogleUser *)user
         }
 
         // configure download button
+        cell.imgDownload.image = [[UIImage imageNamed:@"download"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];;
         if(![self checkIsEmptyString:self.donwloadBtnImageName]){
-            
-            cell.imgDownload.image = [UIImage imageNamed:self.donwloadBtnImageName];
-            
+            cell.imgDownload.image = [[UIImage imageNamed:self.donwloadBtnImageName] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];;
         }
         
         cell.btnDownload.tag = indexPath.row;
         [cell.btnDownload addTarget:self action:@selector(btnDownloadAction:) forControlEvents:UIControlEventTouchUpInside];
-        
     }
-    
-    cell.lblSubtitle.text = [NSString stringWithFormat:@"%@  %@",fileExtension,fileSize];
-    cell.lblSubtitle.textColor = [UIColor lightGrayColor];
     
     // Icon setup from user
     if ([self.delegate respondsToSelector:@selector(delegateSetFIleOrFolderIcon:)]) {
         cell.imgFileIcon.image = [self.delegate delegateSetFIleOrFolderIcon:file];
-    }
-    
-    // Default Icon
-    else
-    {
+    } else {
         if ( ![self checkIsEmptyString:file.fileExtension] ) {
             cell.imgFileIcon.image = [UIImage imageNamed:file.fileExtension];
             // If image still not found the default image
             if (!cell.imgFileIcon.image) {
                 cell.imgFileIcon.image = [UIImage imageNamed:@"file"];
             }
-        }
-        
-        else if (file.fileExtension == nil && [file.mimeType isEqualToString:@"application/vnd.google-apps.folder"]) {
+        } else if (file.fileExtension == nil && [file.mimeType isEqualToString:@"application/vnd.google-apps.folder"]) {
             cell.imgFileIcon.image = [UIImage imageNamed:@"folder"];
+        } else {
+            cell.imgFileIcon.image = [UIImage imageNamed:@"file"];
         }
-        
-        else
-        cell.imgFileIcon.image = [UIImage imageNamed:@"file"];
     }
-    
-    cell.accessoryView.tintColor = self.colorTheme;
+
+    cell.accessoryView = nil;
     cell.lblTitle.text = file.name;
     cell.lblTitle.textColor = [UIColor whiteColor];
+    cell.lblSubtitle.text = [NSString stringWithFormat:@"%@  %@",fileExtension,fileSize];
+    cell.lblSubtitle.textColor = [UIColor lightGrayColor];
 
     return cell;
 }
