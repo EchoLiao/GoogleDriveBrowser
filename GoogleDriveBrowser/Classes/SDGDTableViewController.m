@@ -455,6 +455,7 @@ didSignInForUser:(GIDGoogleUser *)user
     }
     
     cell.lblSubtitle.text = [NSString stringWithFormat:@"%@  %@",fileExtension,fileSize];
+    cell.lblSubtitle.textColor = [UIColor lightGrayColor];
     
     // Icon setup from user
     if ([self.delegate respondsToSelector:@selector(delegateSetFIleOrFolderIcon:)]) {
@@ -482,8 +483,8 @@ didSignInForUser:(GIDGoogleUser *)user
     
     cell.accessoryView.tintColor = self.colorTheme;
     cell.lblTitle.text = file.name;
-    //cell.textLabel.lineBreakMode =  NSLineBreakByTruncatingMiddle;
-    
+    cell.lblTitle.textColor = [UIColor whiteColor];
+
     return cell;
 }
 
