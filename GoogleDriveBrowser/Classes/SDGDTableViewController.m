@@ -45,12 +45,11 @@
     if (self.navigationController.viewControllers.count == 1) {
         [self performSelector:@selector(GDAuth) withObject:self afterDelay:0.5 ];
         self.signInButton = [[GIDSignInButton alloc] init];
-        
+        self.signInButton.style = kGIDSignInButtonStyleWide;
+        self.signInButton.colorScheme = kGIDSignInButtonColorSchemeDark;
         [self.view addSubview:self.signInButton];
         self.signInButton.center = self.view.center;
-        
-    }
-    else{
+    } else {
         [self.indicator startAnimating];
         [self listFiles];
     }
@@ -73,12 +72,10 @@
     float navWidth , navHeight;
     navHeight = self.navigationController.navigationBar.bounds.size.height;
     navWidth = self.navigationController.navigationBar.bounds.size.width;
-    
-    
-    // done button
-    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(btnActionDone)];
-    self.navigationItem.rightBarButtonItem = doneButton;
-    
+
+    self.navigationItem.leftBarButtonItem  = [[UIBarButtonItem alloc] initWithTitle:@"More" style:UIBarButtonItemStyleDone target:self action:@selector(btnActionSwitchAccount)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(btnActionDone)];
+
 #pragma mark - refresh controls
     // Add a refresh control, pull down to refresh
     if ([UIRefreshControl class]) {
@@ -625,14 +622,25 @@ didSignInForUser:(GIDGoogleUser *)user
 }
 
 -(void)btnActionDone{
-    
     [UIApplication sharedApplication].networkActivityIndicatorVisible = false;
     if ([self.delegate respondsToSelector:@selector(delegateDoneButtonTapped)]) {
         [self.delegate delegateDoneButtonTapped];
     }
-    
     [self dismissViewControllerAnimated:YES completion:nil];
-    
+}
+
+- (void)btnActionSwitchAccount {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = false;
+    UIAlertController *actionCtrl = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    [actionCtrl addAction:[UIAlertAction actionWithTitle:@"Switch to another account" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+        [self dismissViewControllerAnimated:YES completion:^{
+            if ([self.delegate respondsToSelector:@selector(delegateDidSelectedSwitchAccount)]) {
+                [self.delegate delegateDidSelectedSwitchAccount];
+            }
+        }];
+    }]];
+    [actionCtrl addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [self presentViewController:actionCtrl animated:YES completion:nil];
 }
 
 -(void)btnActionCancelDownload{

@@ -120,5 +120,6 @@
  */
 - (void)delegateDoneButtonTapped;
 
+- (void)delegateDidSelectedSwitchAccount;
 
 @end
