@@ -350,38 +350,22 @@ didSignInForUser:(GIDGoogleUser *)user
 
 
 
-- (void)refreshTableView{
-    
+- (void)refreshTableView {
     GTLRDrive_FileList *result = [self storeOutFileObject];
-    NSMutableString *output = [[NSMutableString alloc] init];
     [self.fileListArray removeAllObjects];
-    //self.signInButton.hidden = true;
-    //[self.signInButton removeFromSuperview];
-    
+
     if (result.files.count > 0) {
-        [output appendString:@"Files:\n"];
-        int count = 1;
         for (GTLRDrive_File *file in result.files) {
-            //file.fileExtension
-            //file.mimeType
-            [output appendFormat:@"%@ (%@)\n", file.name, file.identifier];
-            NSLog(@"Output name = %@",file.name);
-            count++;
             [self.fileListArray addObject:file];
         }
         [self.tableView reloadData];
         if (@available(iOS 10.0, *)) {
             [self.tableView.refreshControl endRefreshing];
         } else {
-            // Fallback on earlier versions
         }
-        
     } else {
-        self.lblnoData.text = @"No files found.";
-        [output appendString:@"No files found."];
+        self.lblnoData.text = @"No medias found.";
     }
-    //self.output.text = output;
-    
 }
 
 - (void)refreshVisibleRows {
