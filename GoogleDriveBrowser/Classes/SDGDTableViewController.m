@@ -261,29 +261,23 @@ didSignInForUser:(GIDGoogleUser *)user
     }
     
     self.fetcher = [self.service.fetcherService fetcherWithRequest:downloadRequest];
+    self.fetcher.destinationFileURL = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Documents/%@", NSHomeDirectory(), file.name]];
+    self.fetcher.retryEnabled = YES;
     
     // Progress
-    [self.fetcher setReceivedProgressBlock:^(int64_t bytesWritten, int64_t totalBytesWritten) {
-        
+    [self.fetcher setDownloadProgressBlock:^(int64_t bytesWritten, int64_t totalBytesWritten, int64_t totalBytesExpectedToWrite) {
         float progress = ((float)totalBytesWritten/[file.size floatValue]);
         [weakSelf updateDownloadProgress:progress];
         
         if (file.size!=nil) {
             weakSelf.lblProgress.text = [NSString stringWithFormat:@"Downloading %@ of %@",[NSByteCountFormatter stringFromByteCount:totalBytesWritten countStyle:NSByteCountFormatterCountStyleFile] , [NSByteCountFormatter stringFromByteCount:[file.size longLongValue] countStyle:NSByteCountFormatterCountStyleFile] ];
-        }
-        
-        else{
+        } else{
             weakSelf.lblProgress.text = [NSString stringWithFormat:@"Downloading... %@ ",[NSByteCountFormatter stringFromByteCount:totalBytesWritten countStyle:NSByteCountFormatterCountStyleFile] ];
-            
         }
-        
         
         if ([weakSelf.delegate respondsToSelector:@selector(delegateDownloadProgress:downloadByte:totalRecived:)]) {
             [weakSelf.delegate delegateDownloadProgress:file downloadByte:bytesWritten totalRecived:totalBytesWritten];
         }
-        
-        
-        
     }];
     
     
@@ -527,7 +521,6 @@ didSignInForUser:(GIDGoogleUser *)user
 
 // List up to 1000 files in Drive
 - (void)listFiles {
-    
     self.lblnoData.text = @"";
     GTLRDriveQuery_FilesList *query = [GTLRDriveQuery_FilesList query];
     if ([self.delegate respondsToSelector:@selector(delegateFileListingDidStart)]) {
@@ -536,15 +529,10 @@ didSignInForUser:(GIDGoogleUser *)user
     
     if ([self.delegate respondsToSelector:@selector(delegateSetQueryWithFolderID:)]) {
         query = [self.delegate delegateSetQueryWithFolderID:_folderID];
-        
-    }
-    
-    else{
-        
+    } else {
         query.fields = @"kind,nextPageToken,files(mimeType,id,kind,name,webViewLink,thumbnailLink,fileExtension,size, createdTime,modifiedTime)";
         query.pageSize = 1000;
         query.q = [NSString stringWithFormat:@"trashed = false and '%@' In parents ",_folderID];
-        
     }
     
     [self.service executeQuery:query
