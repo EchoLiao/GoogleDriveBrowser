@@ -18,6 +18,7 @@
 @property (nonatomic, strong)  UILabel *lblnoData;
 @property (nonatomic, strong)  UIView *progressView;
 @property (nonatomic, strong)  UILabel *lblProgress;
+@property (nonatomic, strong)  UIBarButtonItem *moreBtnItem;
 
 @property (nonatomic, strong)  GTLRDriveService *service;
 @property (nonatomic, strong)  GTMSessionFetcher *fetcher;
@@ -58,7 +59,9 @@
 
 -(void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:YES];
+
     self.navigationItem.title = self.title;
+    self.navigationItem.leftBarButtonItem = self.navigationController.viewControllers.count == 1 ? self.moreBtnItem : nil;
 }
 
 -(void)UISetup{
@@ -73,7 +76,7 @@
     navHeight = self.navigationController.navigationBar.bounds.size.height;
     navWidth = self.navigationController.navigationBar.bounds.size.width;
 
-    self.navigationItem.leftBarButtonItem  = [[UIBarButtonItem alloc] initWithTitle:@"More" style:UIBarButtonItemStyleDone target:self action:@selector(btnActionSwitchAccount)];
+    self.moreBtnItem = [[UIBarButtonItem alloc] initWithTitle:@"More" style:UIBarButtonItemStyleDone target:self action:@selector(btnActionSwitchAccount)];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(btnActionDone)];
 
 #pragma mark - refresh controls
