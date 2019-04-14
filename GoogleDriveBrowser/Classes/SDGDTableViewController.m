@@ -301,7 +301,8 @@ didSignInForUser:(GIDGoogleUser *)user
             if ([self.delegate respondsToSelector:@selector(delegateDownloadedFileWithFileDetails:downloadedData:)]) {
                 [self.delegate delegateDownloadedFileWithFileDetails:file downloadedData:data];
             }
-            
+
+            [self refreshVisibleRows];
             
             //Add successful notification just bellow Navigation
             if (self.isEnableProgressView) {
@@ -383,6 +384,10 @@ didSignInForUser:(GIDGoogleUser *)user
     
 }
 
+- (void)refreshVisibleRows {
+    [self.tableView reloadRowsAtIndexPaths:[self.tableView indexPathsForVisibleRows] withRowAnimation:UITableViewRowAnimationAutomatic];
+}
+
 
 
 #pragma mark - UITV
@@ -407,15 +412,16 @@ didSignInForUser:(GIDGoogleUser *)user
         cell = [[SDGDTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellID];
     }
     cell.imageView.image = nil;
+
+    GTLRDrive_File *file = self.fileListArray[indexPath.row];
+    NSString *fileExtension= @"", *fileSize=@"";
     
-    cell.btnDownload.hidden = false;
-    cell.imgDownload.hidden = false;
+    cell.btnDownload.hidden = [self isFileDownloaded:file];
+    cell.imgDownload.hidden = [self isFileDownloaded:file];
     cell.imgDownload.tintColor = [UIColor whiteColor];
 
     cell.accessoryType = UITableViewCellAccessoryNone;
-    GTLRDrive_File *file = self.fileListArray[indexPath.row];
-    NSString *fileExtension= @"",*fileSize=@"";
-    
+
     /// Check if folder
     if (file.fileExtension == nil && [file.mimeType isEqualToString:@"application/vnd.google-apps.folder"]) {
         // This is folder
@@ -479,6 +485,7 @@ didSignInForUser:(GIDGoogleUser *)user
     if ([self.delegate respondsToSelector:@selector(delegateSelectedFileOrFolderInfo:)]) {
         [self.delegate delegateSelectedFileOrFolderInfo: file];
     }
+
     // If only folder then will go next step
     if (file.fileExtension == nil && [file.mimeType isEqualToString:@"application/vnd.google-apps.folder"]) {
         UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"SDGD"
@@ -496,27 +503,26 @@ didSignInForUser:(GIDGoogleUser *)user
         obj.isEnableActivityIndicator =self.isEnableActivityIndicator;
         
         [self.navigationController pushViewController:obj animated:YES];
-    }
-    else // Download or open with safari
-    {
-        // Open with browser
+    } else {
         if (self.isEnablefileViewOption) {
             if (@available(iOS 10.0, *)) {
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:file.webViewLink] options:@{} completionHandler:nil];
             } else {
-                // Fallback on earlier versions
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:file.webViewLink]];
             }
-            
+        } else {
+            if (![self isFileDownloaded:file]) {
+                [self downloadFile:file];
+            } else {
+                UIAlertController *actionCtrl = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+                [actionCtrl addAction:[UIAlertAction actionWithTitle:@"Re-Download" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+                    [self downloadFile:file];
+                }]];
+                [actionCtrl addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:actionCtrl animated:YES completion:nil];
+            }
         }
-        // Download the file
-        else{
-            [self downloadFile:file];
-        }
-        
-        
     }
-    
 }
 
 #pragma mark - Google Drive
@@ -647,6 +653,11 @@ didSignInForUser:(GIDGoogleUser *)user
 }
 
 #pragma mark - Helper Functions
+
+- (BOOL)isFileDownloaded:(GTLRDrive_File *)file {
+    NSString *path = [NSString stringWithFormat:@"%@/Documents/%@", NSHomeDirectory(), file.name];
+    return [[NSFileManager defaultManager] fileExistsAtPath:path];
+}
 
 -(BOOL)checkIsEmptyString:( NSString*_Nullable)str{
     
