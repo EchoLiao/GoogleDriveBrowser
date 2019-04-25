@@ -264,7 +264,7 @@ didSignInForUser:(GIDGoogleUser *)user
     }
     
     self.fetcher = [self.service.fetcherService fetcherWithRequest:downloadRequest];
-    self.fetcher.destinationFileURL = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Documents/%@", NSHomeDirectory(), file.name]];
+    self.fetcher.destinationFileURL = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/%@", self.downloadedFolder ?: NSTemporaryDirectory(), file.name]];
     self.fetcher.retryEnabled = YES;
     
     // Progress

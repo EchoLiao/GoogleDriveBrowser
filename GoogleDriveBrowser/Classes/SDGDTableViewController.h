@@ -38,6 +38,8 @@
 //  current user as being in the signed out state.
 @property (nonatomic,assign) BOOL isSignOutSilently;
 
+@property (nonatomic, strong) NSString *downloadedFolder;
+
 @end
 
 @protocol SDGDTableViewControllerDelegate <NSObject>
