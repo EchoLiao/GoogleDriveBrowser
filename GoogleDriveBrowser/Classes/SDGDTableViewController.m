@@ -264,7 +264,11 @@ didSignInForUser:(GIDGoogleUser *)user
     }
     
     self.fetcher = [self.service.fetcherService fetcherWithRequest:downloadRequest];
-    self.fetcher.destinationFileURL = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/%@", self.downloadedFolder ?: NSTemporaryDirectory(), file.name]];
+    if ([self.delegate respondsToSelector:@selector(delegateDownloadFileToPath:)]) {
+        self.fetcher.destinationFileURL = [NSURL fileURLWithPath:[self.delegate delegateDownloadFileToPath:file]];
+    } else {
+        self.fetcher.destinationFileURL = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/%@", NSTemporaryDirectory(), file.name]];
+    }
     self.fetcher.retryEnabled = YES;
     
     // Progress
@@ -495,16 +499,14 @@ didSignInForUser:(GIDGoogleUser *)user
                 [[UIApplication sharedApplication] openURL:[NSURL URLWithString:file.webViewLink]];
             }
         } else {
-            if (![self isFileDownloaded:file]) {
+            NSString *title = [self isFileDownloaded:file] ? @"Re-Download" : @"Download";
+            UIAlertActionStyle style = [self isFileDownloaded:file] ? UIAlertActionStyleDestructive : UIAlertActionStyleDefault;
+            UIAlertController *actionCtrl = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+            [actionCtrl addAction:[UIAlertAction actionWithTitle:title style:style handler:^(UIAlertAction * _Nonnull action) {
                 [self downloadFile:file];
-            } else {
-                UIAlertController *actionCtrl = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-                [actionCtrl addAction:[UIAlertAction actionWithTitle:@"Re-Download" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
-                    [self downloadFile:file];
-                }]];
-                [actionCtrl addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-                [self presentViewController:actionCtrl animated:YES completion:nil];
-            }
+            }]];
+            [actionCtrl addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+            [self presentViewController:actionCtrl animated:YES completion:nil];
         }
     }
 }
@@ -639,8 +641,10 @@ didSignInForUser:(GIDGoogleUser *)user
 #pragma mark - Helper Functions
 
 - (BOOL)isFileDownloaded:(GTLRDrive_File *)file {
-    NSString *path = [NSString stringWithFormat:@"%@/Documents/%@", NSHomeDirectory(), file.name];
-    return [[NSFileManager defaultManager] fileExistsAtPath:path];
+    if ([self.delegate respondsToSelector:@selector(delegateIsDownloadedEver:)]) {
+        return [self.delegate delegateIsDownloadedEver:file];
+    }
+    return NO;
 }
 
 -(BOOL)checkIsEmptyString:( NSString*_Nullable)str{

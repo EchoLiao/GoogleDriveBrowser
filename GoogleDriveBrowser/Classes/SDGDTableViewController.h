@@ -38,8 +38,6 @@
 //  current user as being in the signed out state.
 @property (nonatomic,assign) BOOL isSignOutSilently;
 
-@property (nonatomic, strong) NSString *downloadedFolder;
-
 @end
 
 @protocol SDGDTableViewControllerDelegate <NSObject>
@@ -63,6 +61,8 @@
  *  Like fileExtension, name, mimetype, iconLink etc . See in  GTLRDrive_File section
  */
 - (void)delegateSelectedFileOrFolderInfo: (GTLRDrive_File *)fileInfo;
+
+- (nonnull NSString *)delegateDownloadFileToPath:(GTLRDrive_File *)fileInfo;
 
 /**
  *  Download successfull
@@ -123,5 +123,7 @@
 - (void)delegateDoneButtonTapped;
 
 - (void)delegateDidSelectedSwitchAccount;
+
+- (BOOL)delegateIsDownloadedEver:(GTLRDrive_File *)fileInfo;
 
 @end
