@@ -9,7 +9,14 @@
 #import "SDGDTableViewController.h"
 #import "SDGDTableViewCell.h"
 
+#define BM_HEX_RGB(rgbValue) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0]
+
+#define kColorPageBack      BM_HEX_RGB(0x121112)
+#define kColorBtnBack       BM_HEX_RGB(0x201f24)
+
 #define FILE_OBJECT_STORE_KEY @"GD_persistedFILE"
+
+
 @interface SDGDTableViewController ()
 
 /// The controller's main download progress view.
@@ -38,8 +45,18 @@
     self.fileListArray = [NSMutableArray array];
     self.navigationItem.title = self.title;
     if (self.colorTheme == nil) self.colorTheme = [UIColor colorWithRed:0.0/255.0f green:122.0/255.0f blue:255.0/255.0f alpha:1.0f];
+
     self.view.tintColor = self.colorTheme;
-    
+    self.tableView.backgroundColor = kColorPageBack;
+    self.tableView.separatorColor = kColorPageBack;
+    self.navigationController.navigationBar.translucent = NO;
+    self.navigationController.navigationBar.barTintColor = kColorBtnBack;
+    self.navigationController.navigationBar.tintColor = self.colorTheme;
+    self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
+    self.navigationController.navigationBar.shadowImage = [UIImage new];
+    [self.navigationController.navigationBar setBackgroundImage:[UIImage new] forBarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
+
+
     [self UISetup];
     
     /// Only first time auth and sign in button will appear
@@ -49,7 +66,7 @@
         self.signInButton.style = kGIDSignInButtonStyleWide;
         self.signInButton.colorScheme = kGIDSignInButtonColorSchemeDark;
         [self.view addSubview:self.signInButton];
-        self.signInButton.center = self.view.center;
+        self.signInButton.center = CGPointMake(self.view.center.x, self.view.center.y - 100);
     } else {
         [self.indicator startAnimating];
         [self listFiles];
@@ -141,7 +158,7 @@
         self.indicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         self.indicator.frame = CGRectMake(0.0, 0.0, 60.0, 60.0);
         self.indicator.color = self.colorTheme;
-        self.indicator.center = self.view.center;
+        self.indicator.center = CGPointMake(self.view.center.x, self.view.center.y - 100);
         [self.view addSubview:self.indicator];
         [self.indicator bringSubviewToFront:self.view];
         [UIApplication sharedApplication].networkActivityIndicatorVisible = TRUE;
@@ -152,7 +169,6 @@
     self.lblnoData.textColor = [UIColor lightGrayColor];
     self.lblnoData.text = @"";
     [self.view addSubview:self.lblnoData];
-    //self.lblnoData.center = self.view.center;
     self.lblnoData.textAlignment = NSTextAlignmentCenter;
     [self.lblnoData bringSubviewToFront:self.view];
     
@@ -456,6 +472,8 @@ didSignInForUser:(GIDGoogleUser *)user
         }
     }
 
+    cell.backgroundColor = kColorBtnBack;
+    cell.selectedBackgroundView = [UIView new];
     cell.accessoryView = nil;
     cell.lblTitle.text = file.name;
     cell.lblTitle.textColor = [UIColor whiteColor];
