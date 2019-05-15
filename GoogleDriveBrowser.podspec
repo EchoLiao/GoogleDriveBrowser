@@ -32,9 +32,9 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '8.0'
 
   s.source_files = 'GoogleDriveBrowser/Classes/**/*'
-  
+
   s.platform     = :ios, '8.0'
-  
+
   s.static_framework = true
   s.dependency 'GoogleAPIClientForREST/Drive', '~> 1.2.1'
   s.dependency 'Google/SignIn', '~> 3.0.3'
@@ -44,8 +44,8 @@ Pod::Spec.new do |s|
     #    'GoogleDriveBrowser' => ['GoogleDriveBrowser/Resources//**/*']
     #    }
 
-    
-  s.resources = "Resources/**/*"
+
+  s.resources = "Resources/**/*.{png,storyboard}"
 
   s.public_header_files = 'GoogleDriveBrowser/Classes/SDGDTableViewController.h'
 
