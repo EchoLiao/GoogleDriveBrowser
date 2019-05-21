@@ -36,8 +36,8 @@ Pod::Spec.new do |s|
   s.platform     = :ios, '8.0'
 
   s.static_framework = true
-  s.dependency 'GoogleAPIClientForREST/Drive', '~> 1.2.1'
-  s.dependency 'Google/SignIn', '~> 3.0.3'
+  s.dependency 'GoogleAPIClientForREST/Drive', '~> 1.3.9'
+  s.dependency 'GoogleSignIn', '~> 4.4.0'
   #s.xcconfig = { "FRAMEWORK_SEARCH_PATHS" => "$(PODS_ROOT)/Google/SignIn"}
 
     #s.resource_bundles = {
